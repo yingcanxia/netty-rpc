@@ -23,58 +23,58 @@ public class RPCRegistry {
 	public RPCRegistry(int port) {
 		this.port = port;
 	}
+	public static void main(String[] args) {
+		new RPCRegistry(8080).start();
+	}
 	
 	public void start() {
 		try {
-			//¸ÃÀàÓëserverSocketºÍserverSocketChannelÏàËÆ
-			//Ö÷Ïß³Ì³Ø³õÊ¼»¯£¬selector
+			//è¯¥ç±»ä¸serverSocketå’ŒserverSocketChannelç›¸ä¼¼
+			//ä¸»çº¿ç¨‹æ± åˆå§‹åŒ–ï¼Œselector
 			EventLoopGroup bossGroup=new NioEventLoopGroup();
-			//×ÓÏß³Ì³Ø£¬¶ÔÓ¦¿Í»§¶ËµÄ´¦ÀíÂß¼­
+			//å­çº¿ç¨‹æ± ï¼Œå¯¹åº”å®¢æˆ·ç«¯çš„å¤„ç†é€»è¾‘
 			EventLoopGroup workerGroup=new NioEventLoopGroup();
 			
 			ServerBootstrap server=new ServerBootstrap();
-			//nettyÊÇ»ùÓÚnio
-			//ÆäÖĞselectorÊÇÖ÷Ïß³Ì£¬workÏß³Ì
+			//nettyæ˜¯åŸºäºnio
+			//å…¶ä¸­selectoræ˜¯ä¸»çº¿ç¨‹ï¼Œworkçº¿ç¨‹
 			server.group(bossGroup,workerGroup)
 				.channel(NioServerSocketChannel.class)
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 	
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-						// ÔÚnettyÖĞ°ÉËùÓĞµÄÒµÎñÂß¼­´¦ÀíÈ«²¿¹é×Üµ½Ò»¸ö¶ÓÁĞ
-						//¶ÓÁĞÖĞ°üº¬ÁË¸÷ÖÖµÄ´¦ÀíÂß¼­ÓĞÒ»¸ö·â×°
-						//·â×°³ÉÒ»¸ö¶ÔÏó£¬ÎŞËø»°´®ĞĞÈÎÎñ¶ÓÁĞ
+						// åœ¨nettyä¸­å§æ‰€æœ‰çš„ä¸šåŠ¡é€»è¾‘å¤„ç†å…¨éƒ¨å½’æ€»åˆ°ä¸€ä¸ªé˜Ÿåˆ—
+						//é˜Ÿåˆ—ä¸­åŒ…å«äº†å„ç§çš„å¤„ç†é€»è¾‘æœ‰ä¸€ä¸ªå°è£…
+						//å°è£…æˆä¸€ä¸ªå¯¹è±¡ï¼Œæ— é”è¯ä¸²è¡Œä»»åŠ¡é˜Ÿåˆ—
 						//pipeline
 						ChannelPipeline pipeline=ch.pipeline();
-						//¾ÍÊÇ¶Ô´¦ÀíÂß¼­µÄ·â×°
-						//¶ÔÓÚ×Ô¶¨ÒåĞ­Òé½øĞĞ±à½âÂë
+						//å°±æ˜¯å¯¹å¤„ç†é€»è¾‘çš„å°è£…
+						//å¯¹äºè‡ªå®šä¹‰åè®®è¿›è¡Œç¼–è§£ç 
 						pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4,0,4));
-						//×Ô¶¨Òå±àÂëÆ÷ 
+						//è‡ªå®šä¹‰ç¼–ç å™¨ 
 						pipeline.addLast(new LengthFieldPrepender(4));
-						//Êµ²Î´¦Àí
+						//å®å‚å¤„ç†
 						pipeline.addLast("encoder",new ObjectEncoder());
-						//´Ë´¦¿ªÊ¼ĞèÒªÖ´ĞĞ×Ô¼ºËùĞèÒªµÄÂß¼­
-						//1.×¢²á¸øÃ¿¸ö¶ÔÏóÈ¡Ãû×Ö£¬¶ÔÍâÌá¹©·şÎñµÄÃû×Ö
+						//æ­¤å¤„å¼€å§‹éœ€è¦æ‰§è¡Œè‡ªå·±æ‰€éœ€è¦çš„é€»è¾‘
+						//1.æ³¨å†Œç»™æ¯ä¸ªå¯¹è±¡å–åå­—ï¼Œå¯¹å¤–æä¾›æœåŠ¡çš„åå­—
 						pipeline.addLast("decoder",new ObjectDecoder(Integer.MAX_VALUE,ClassResolvers.cacheDisabled(null)));
-						//2.¶ÔÓÚÃ¿Ò»¸ö·şÎñ½øĞĞµÇ¼Ç
+						//2.å¯¹äºæ¯ä¸€ä¸ªæœåŠ¡è¿›è¡Œç™»è®°
 						pipeline.addLast(new RegistryHandler());
 						
 					}
 				})
-				//×î´óµÄkeyµÄÊıÁ¿
+				//æœ€å¤§çš„keyçš„æ•°é‡
 				.option(ChannelOption.SO_BACKLOG, 128)
-				//±£Ö¤Ã¿¸ö×ÓÏß³Ì¶¼¿ÉÒÔ±»»ØÊÕÀûÓÃ
+				//ä¿è¯æ¯ä¸ªå­çº¿ç¨‹éƒ½å¯ä»¥è¢«å›æ”¶åˆ©ç”¨
 				.childOption(ChannelOption.SO_KEEPALIVE, true);
-			//ÕıÊ½Æô¶¯·şÎñ£¬Ïàµ±ÓÚÓÃÒ»¸öËÀÑ­»·¿ªÊ¼ÂÖÑµ
+			//æ­£å¼å¯åŠ¨æœåŠ¡ï¼Œç›¸å½“äºç”¨ä¸€ä¸ªæ­»å¾ªç¯å¼€å§‹è½®è®­
 			ChannelFuture future= server.bind(this.port).sync();
-			System.out.println("ÎÒµÄRPC¿ò¼ÜÒÑ¾­Æô¶¯£¬¼àÌı¶Ë¿ÚÎª£º"+port);
+			System.out.println("æˆ‘çš„RPCæ¡†æ¶å·²ç»å¯åŠ¨ï¼Œç›‘å¬ç«¯å£ä¸ºï¼š"+port);
 			future.channel().closeFuture().sync();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-	}
-	public static void main(String[] args) {
-		new RPCRegistry(8080).start();
 	}
 }

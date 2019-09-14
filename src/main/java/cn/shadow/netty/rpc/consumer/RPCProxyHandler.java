@@ -16,7 +16,7 @@ public class RPCProxyHandler extends ChannelInboundHandlerAdapter{
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		// TODO Auto-generated method stub
 		cause.printStackTrace();
-		System.out.println("¿Í»§Ëã³öÏÖÒì³£");
+		System.out.println("å®¢æˆ·ç®—å‡ºç°å¼‚å¸¸");
 	}
 
 	public Object getResponce() {

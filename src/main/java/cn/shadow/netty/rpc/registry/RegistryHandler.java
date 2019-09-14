@@ -15,14 +15,14 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class RegistryHandler extends ChannelInboundHandlerAdapter{
 	private List<String>classNames=new ArrayList<String>();
 	private Map<String, Object>registryMap=new ConcurrentHashMap<String, Object>();
-	//Á½¸ö·½·¨
-	//¿Í»§¶Ë½¨Á¢Á¬½ÓµÄ·½·¨
-	//¿Í»§¶Ë±¨´íµÄ·½·¨
+	//ä¸¤ä¸ªæ–¹æ³•
+	//å®¢æˆ·ç«¯å»ºç«‹è¿æ¥çš„æ–¹æ³•
+	//å®¢æˆ·ç«¯æŠ¥é”™çš„æ–¹æ³•
 	
 
-	//Ë¼Â·ÈçÏÂ
-	//¸ù¾İ°üÃû½«ËùÓĞ·ûºÏÌõ¼şµÄclass·Åµ½Ò»¸öÈİÆ÷ÖĞ
-	//Èç¹ûÊÇ·Ö²¼Ê½µÄ»°¾ÍÒª¶ÁÈ¡ÅäÖÃÎÄ¼ş
+	//æ€è·¯å¦‚ä¸‹
+	//æ ¹æ®åŒ…åå°†æ‰€æœ‰ç¬¦åˆæ¡ä»¶çš„classæ”¾åˆ°ä¸€ä¸ªå®¹å™¨ä¸­
+	//å¦‚æœæ˜¯åˆ†å¸ƒå¼çš„è¯å°±è¦è¯»å–é…ç½®æ–‡ä»¶
 	public RegistryHandler(){
 		scannerClass("cn.shadow.netty.rpc.provider");
 		doRegister();
@@ -38,9 +38,9 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter{
 				Class<?>clazz=Class.forName(className);
 				Class<?>i=clazz.getInterfaces()[0];
 				String serviceName=i.getName();
-				//±¾À´ÕâÀï´æµÄÓ¦¸ÃÊÇ¸öÍøÂçÂ·¾¶£¬´ÓÅäÖÃÎÄ¼şÖĞ¶ÁÈ¡
-				//ÔÚµ÷ÓÃµÄÊ±ºòÔÙÈ¥½âÎö
-				//¸øÃ¿Ò»¸ö¶ÔÓ¦µÄclassÆğÃû×÷Îª·şÎñÃû³Æ£¬²¢±£´æµ½ÈİÆ÷Ö®ÖĞ
+				//æœ¬æ¥è¿™é‡Œå­˜çš„åº”è¯¥æ˜¯ä¸ªç½‘ç»œè·¯å¾„ï¼Œä»é…ç½®æ–‡ä»¶ä¸­è¯»å–
+				//åœ¨è°ƒç”¨çš„æ—¶å€™å†å»è§£æ
+				//ç»™æ¯ä¸€ä¸ªå¯¹åº”çš„classèµ·åä½œä¸ºæœåŠ¡åç§°ï¼Œå¹¶ä¿å­˜åˆ°å®¹å™¨ä¹‹ä¸­
 				registryMap.put(serviceName, clazz.newInstance());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -50,7 +50,7 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter{
 	}
 	
 	private void scannerClass(String packageName) {
-		// Õı³£À´ËµµÄ»°ÊÇÓ¦¸ÃÈ¥¶ÁÅäÖÃÎÄ¼ş£¬Ä¿Ç°¼òµ¥´Ö±©Ö±½ÓÉ¨Ãè±¾µØ
+		// æ­£å¸¸æ¥è¯´çš„è¯æ˜¯åº”è¯¥å»è¯»é…ç½®æ–‡ä»¶ï¼Œç›®å‰ç®€å•ç²—æš´ç›´æ¥æ‰«ææœ¬åœ°
 		URL url= this.getClass().getClassLoader().getResource(packageName.replaceAll("\\.","/"));
 		File classPath=new File(url.getFile());
 		for(File file:classPath.listFiles()) {
@@ -64,10 +64,10 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter{
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		//ÓĞ¿Í»§¶ËÁ¬ÉÏµÄÊ±ºò£¬½øĞĞ»Øµ÷
-		//µ±ÓĞ¿Í»§¶ËÁ¬½Ó¹ıÀ´Ö®ºó£¬netty»á×Ô¶¯½«ĞÅÏ¢½âÎö³ÉÒ»¸ö¶ÔÏóinvokeProtocol,»ñÈ¡Ğ­ÒéÄÚÈİ
-		//È¥×¢²áºÃµÄÈİÆ÷ÖĞÑ°ÕÒ·ûºÏÌõ¼şµÄ·şÎñ
-		//Í¨¹ıÔ¶³Ìµ÷ÓÃ£¬´Ó¶øµÃµ½½á¹û²¢»Ø¸´¸ø¿Í»§¶Ë
+		//æœ‰å®¢æˆ·ç«¯è¿ä¸Šçš„æ—¶å€™ï¼Œè¿›è¡Œå›è°ƒ
+		//å½“æœ‰å®¢æˆ·ç«¯è¿æ¥è¿‡æ¥ä¹‹åï¼Œnettyä¼šè‡ªåŠ¨å°†ä¿¡æ¯è§£ææˆä¸€ä¸ªå¯¹è±¡invokeProtocol,è·å–åè®®å†…å®¹
+		//å»æ³¨å†Œå¥½çš„å®¹å™¨ä¸­å¯»æ‰¾ç¬¦åˆæ¡ä»¶çš„æœåŠ¡
+		//é€šè¿‡è¿œç¨‹è°ƒç”¨ï¼Œä»è€Œå¾—åˆ°ç»“æœå¹¶å›å¤ç»™å®¢æˆ·ç«¯
 		Object result=new Object();
 		InvokerProtocol request=(InvokerProtocol)msg;
 		if(registryMap.containsKey(request.getClassName())) {
@@ -82,7 +82,7 @@ public class RegistryHandler extends ChannelInboundHandlerAdapter{
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		//Á¬½ÓÒì³£µÄÊ±ºò½øĞĞ»Øµ÷
+		//è¿æ¥å¼‚å¸¸çš„æ—¶å€™è¿›è¡Œå›è°ƒ
 		super.exceptionCaught(ctx, cause);
 	}
 

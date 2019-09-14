@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class InvokerProtocol implements Serializable{
 
-	private String className;//服务名称
-	private String methodName;//方法名称
-	private Class<?> [] parames;//防止重载添加形参列表
+	private String className;//鏈嶅姟鍚嶇О
+	private String methodName;//鏂规硶鍚嶇О
+	private Class<?> [] parames;//闃叉閲嶈浇娣诲姞褰㈠弬鍒楄〃
 	private Object[] values;
 }

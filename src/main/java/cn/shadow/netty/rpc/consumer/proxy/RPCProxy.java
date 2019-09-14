@@ -49,13 +49,13 @@ public class RPCProxy {
 		}
 
 		private Object rpcInvoke(Object proxy, Method method, Object[] args) {
-			//ÏÈÒª¹¹ÔìÒ»¸öĞ­ÒéÄÚÈİ
+			//å…ˆè¦æ„é€ ä¸€ä¸ªåè®®å†…å®¹
 			InvokerProtocol msg=new InvokerProtocol();
 			msg.setClassName(this.clazz.getName());
 			msg.setMethodName(method.getName());
 			msg.setParames(method.getParameterTypes());
 			msg.setValues(args);
-			//ÔÚ´Ë´¦·¢ËÍÏàÓ¦µÄÍøÂçÇëÇó
+			//åœ¨æ­¤å¤„å‘é€ç›¸åº”çš„ç½‘ç»œè¯·æ±‚
 			final RPCProxyHandler proxyHandler= new RPCProxyHandler();
 			EventLoopGroup workGroup=new NioEventLoopGroup();
 			try {
@@ -68,17 +68,17 @@ public class RPCProxy {
 						protected void initChannel(SocketChannel ch) throws Exception {
 							// TODO Auto-generated method stub
 							ChannelPipeline pipeline=ch.pipeline();
-							//¾ÍÊÇ¶Ô´¦ÀíÂß¼­µÄ·â×°
-							//¶ÔÓÚ×Ô¶¨ÒåĞ­Òé½øĞĞ±à½âÂë
+							//å°±æ˜¯å¯¹å¤„ç†é€»è¾‘çš„å°è£…
+							//å¯¹äºè‡ªå®šä¹‰åè®®è¿›è¡Œç¼–è§£ç 
 							pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4,0,4));
-							//×Ô¶¨Òå±àÂëÆ÷ 
+							//è‡ªå®šä¹‰ç¼–ç å™¨ 
 							pipeline.addLast(new LengthFieldPrepender(4));
-							//Êµ²Î´¦Àí
+							//å®å‚å¤„ç†
 							pipeline.addLast("encoder",new ObjectEncoder());
-							//´Ë´¦¿ªÊ¼ĞèÒªÖ´ĞĞ×Ô¼ºËùĞèÒªµÄÂß¼­
-							//1.×¢²á¸øÃ¿¸ö¶ÔÏóÈ¡Ãû×Ö£¬¶ÔÍâÌá¹©·şÎñµÄÃû×Ö
+							//æ­¤å¤„å¼€å§‹éœ€è¦æ‰§è¡Œè‡ªå·±æ‰€éœ€è¦çš„é€»è¾‘
+							//1.æ³¨å†Œç»™æ¯ä¸ªå¯¹è±¡å–åå­—ï¼Œå¯¹å¤–æä¾›æœåŠ¡çš„åå­—
 							pipeline.addLast("decoder",new ObjectDecoder(Integer.MAX_VALUE,ClassResolvers.cacheDisabled(null)));
-							//2.¶ÔÓÚÃ¿Ò»¸ö·şÎñ½øĞĞµÇ¼Ç
+							//2.å¯¹äºæ¯ä¸€ä¸ªæœåŠ¡è¿›è¡Œç™»è®°
 							pipeline.addLast(proxyHandler);
 						}
 						
